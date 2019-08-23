@@ -10,7 +10,7 @@ const app = express();
 /*                                 Middleware                                 */
 /* -------------------------------------------------------------------------- */
 
-if (process.env.NODE_ENV == 'development') {
+if (process.env.NODE_ENV === 'development ') {
   console.log('morgan');
   app.use(morgan('dev'));
 }

@@ -4,7 +4,7 @@
   "description": "Learning Node, express and Mongo DB",
   "main": "app.js",
   "scripts": {
-    "start:dev": "SET NODE_ENV=development && nodemon server.js",
+    "start": "SET NODE_ENV=development && nodemon server.js",
     "start:prod": "SET NODE_ENV=production && nodemon server.js"
   },
   "author": "vivek singh",
@@ -13,6 +13,7 @@
     "dotenv": "^8.1.0",
     "express": "^4.17.1",
     "g": "^2.0.1",
+    "mongoose": "^5.6.10",
     "morgan": "^1.9.1",
     "nodemon": "^1.19.1"
   },
