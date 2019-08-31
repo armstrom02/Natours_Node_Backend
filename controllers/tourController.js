@@ -4,18 +4,22 @@ const Tour = require('./../models/tourModel');
 /* -------------------------------------------------------------------------- */
 /*                               Tour Controller                              */
 /* -------------------------------------------------------------------------- */
+exports.aliasTopTours = (req, res, next) => {
+  req.query.limit = '5';
+  req.query.sort = 'ratingsAverage,price';
+  // req.query.fields = 'name,price,ratingsAverage,summary,difficulty';
+  next();
+};
 
 exports.getAllTours = async (req, res) => {
   try {
     const queryObj = { ...req.query };
 
     /* --------------------------------- Filter --------------------------------- */
-
     const excludedFields = ['page', 'sort', 'limit', 'fileds'];
     excludedFields.forEach(element => delete queryObj[element]);
 
     /* ---------------------------- Advance Filtering --------------------------- */
-
     let queryStr = JSON.stringify(queryObj);
     queryStr = queryStr.replace(/\b(gte|gt|lte|lt\b)/g, match => `$${match}`);
     // { difficulty: 'easy', duration: { gte: '5' } }
@@ -24,7 +28,6 @@ exports.getAllTours = async (req, res) => {
     let query = Tour.find(JSON.parse(queryStr));
 
     /* --------------------------------- Sorting -------------------------------- */
-
     if (req.query.sort) {
       const sortBy = req.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
@@ -35,7 +38,6 @@ exports.getAllTours = async (req, res) => {
     }
 
     /* ----------------------------- Field limiting ----------------------------- */
-
     if (req.query.fields) {
       const fields = req.query.fields.split(',').join(' ');
       query = query.select(fields);
@@ -56,12 +58,8 @@ exports.getAllTours = async (req, res) => {
         throw new Error('This page does not exits');
       }
     }
-    // const query = await Tour.find()
-    //   .where('duration')
-    //   .equals(5)
-    //   .where('difficulty')
-    //   .equals('easy');
 
+    /* ----------------------------- Query Execution ---------------------------- */
     const tours = await query;
 
     res.status(200).json({
