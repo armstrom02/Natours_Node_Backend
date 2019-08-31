@@ -7,7 +7,63 @@ const Tour = require('./../models/tourModel');
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const queryObj = { ...req.query };
+
+    /* --------------------------------- Filter --------------------------------- */
+
+    const excludedFields = ['page', 'sort', 'limit', 'fileds'];
+    excludedFields.forEach(element => delete queryObj[element]);
+
+    /* ---------------------------- Advance Filtering --------------------------- */
+
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt\b)/g, match => `$${match}`);
+    // { difficulty: 'easy', duration: { gte: '5' } }
+    // { difficulty: 'easy', duration: { $gte: '5' } }
+
+    let query = Tour.find(JSON.parse(queryStr));
+
+    /* --------------------------------- Sorting -------------------------------- */
+
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      query = query.sort(sortBy);
+      // sort('price,ratingsAverage)
+      // sort('price ratingsAverage)
+    } else {
+      query = query.sort('-createdAt');
+    }
+
+    /* ----------------------------- Field limiting ----------------------------- */
+
+    if (req.query.fields) {
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
+    }
+
+    /* ------------------------------- Pagination ------------------------------- */
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit * 1 || 100;
+    const skip = limit * (page - 1);
+
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if (skip >= numTours) {
+        throw new Error('This page does not exits');
+      }
+    }
+    // const query = await Tour.find()
+    //   .where('duration')
+    //   .equals(5)
+    //   .where('difficulty')
+    //   .equals('easy');
+
+    const tours = await query;
+
     res.status(200).json({
       status: 'success',
       results: tours.length,
@@ -16,7 +72,7 @@ exports.getAllTours = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: 'failed'
+      message: err
     });
   }
 };
