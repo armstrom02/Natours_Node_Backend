@@ -27,6 +27,7 @@ exports.getAllTours = async (req, res) => {
       data: { tours }
     });
   } catch (err) {
+    console.log(err);
     res.status(400).json({
       status: 'fail',
       message: err
@@ -63,7 +64,7 @@ exports.createTour = async (req, res) => {
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: 'Invalid Data sent'
+      message: err
     });
   }
 };
@@ -126,8 +127,8 @@ exports.getTourStats = async (req, res) => {
         $sort: {
           avgPrice: 1
         }
-      },
-      { $match: { _id: { $ne: 'EASY' } } }
+      }
+      // { $match: { _id: { $ne: 'EASY' } } }
     ]);
 
     res.status(200).json({
