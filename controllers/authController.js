@@ -4,6 +4,7 @@ const User = require('./../models/userModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const sendEmail = require('./../utils/email');
+const crypto = require('crypto');
 
 const signToken = id => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -141,4 +142,36 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   res.status(200).json({ status: 'success', message: 'token send to email' });
 });
 
-exports.resetPassowrd = catchAsync(async (req, res, next) => {});
+exports.resetPassowrd = catchAsync(async (req, res, next) => {
+  // 1) get user based on token.
+  const hasedToken = crypto
+    .createHash('sha256')
+    .update(req.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hasedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  // 2) if token has not expired,and there is user,set the new password.
+  if (!user) {
+    return next(new AppError('Token is invalid or expired', 400));
+  }
+
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetExpires = undefined;
+  user.passwordResetToken = undefined;
+  await user.save();
+
+  // 3) Update changePasswordAt property for the user.
+
+  // 4) Log the user in, send JWT.
+  const token = signToken(user._id);
+
+  res.status(201).json({
+    status: 'success',
+    token
+  });
+});
