@@ -95,6 +95,20 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+tourSchema.index({ price: 1, ratingsAverage: -1 });
+tourSchema.index({ slug: 1 });
+
+// virtual populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour',
+  localField: '_id'
+});
+
+tourSchema.virtual('durationWeeks').get(function() {
+  return this.duration / 7;
+});
+
 // Document middleware
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
@@ -132,17 +146,6 @@ tourSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   console.log(this.pipeline());
   next();
-});
-
-// virtual populate
-tourSchema.virtual('reviews', {
-  ref: 'Review',
-  foreignField: 'tour',
-  localField: '_id'
-});
-
-tourSchema.virtual('durationWeeks').get(function() {
-  return this.duration / 7;
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
