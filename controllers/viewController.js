@@ -19,10 +19,3 @@ exports.getTour = (req, res) => {
     title: 'The Forest Hiker Tour'
   });
 };
-
-exports.getBase = (req, res) => {
-  res.status(200).render('base', {
-    tour: 'The Forest Hiker',
-    user: 'vivek'
-  });
-};
