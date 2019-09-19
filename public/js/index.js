@@ -31,11 +31,16 @@ if (loginForm) {
 
 if (updateDataForm) {
   updateDataForm.addEventListener('submit', e => {
-    const email = document.getElementById('email').value;
-    const name = document.getElementById('name').value;
-
     e.preventDefault();
-    updateSettings({ name, email }, 'update');
+
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+
+    console.log(form);
+
+    updateSettings(form, 'data');
   });
 }
 
