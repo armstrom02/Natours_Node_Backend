@@ -4,7 +4,8 @@
   "description": "Learning Node, express and Mongo DB",
   "main": "app.js",
   "scripts": {
-    "start": "SET NODE_ENV=development && nodemon server.js",
+    "start": "node server.js",
+    "dev": "SET NODE_ENV=development && nodemon server.js",
     "start:prod": "SET NODE_ENV=production && nodemon server.js",
     "debug": "ndb server.js",
     "watch:js": "parcel watch ./public/js/index.js --out-dir ./public/js --out-file bundle.js",
@@ -50,5 +51,8 @@
     "eslint-plugin-react": "^7.14.3",
     "parcel-bundler": "^1.12.3",
     "prettier": "^1.18.2"
+  },
+  "engines": {
+    "node": ">=10.0.0"
   }
 }
