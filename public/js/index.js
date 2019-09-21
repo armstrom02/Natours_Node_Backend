@@ -40,7 +40,6 @@ if (updateDataForm) {
     form.append('email', document.getElementById('email').value);
     form.append('photo', document.getElementById('photo').files[0]);
 
-    console.log(form);
 
     updateSettings(form, 'data');
   });
@@ -75,7 +74,6 @@ if (logOutBtn) {
 }
 
 if (bookBtn) {
-  console.log(bookBtn);
   bookBtn.addEventListener('click', e => {
     e.target.textContent = 'Processing...';
     const { tourId } = e.target.dataset;
